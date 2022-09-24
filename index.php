@@ -17,129 +17,131 @@ use Automattic\WooCommerce\Client;
 
     // print_r($woocommerce->get('products/221/variations'));die;
     // print_r($woocommerce->get('products/attributes'));die;
-    $orders = $woocommerce->get('orders');
 
-    $array_items_order = [];
-    foreach ($orders as $key => $order) {
-        $date = date('Y-m-d');
-    
-        $NumeroPedido = $order->number;
-        $CedulaCliente = isset($order->billing->company) ? $order->billing->company : 0;
-        $NombreCliente = $order->billing->first_name.' '.$order->billing->last_name;
-        $Valor = $order->total;
-        $FechaPedido = $date;
-        $items = $order->line_items;
-        foreach ($items as $key_item => $item) {
-            $array_by_item_orde = [];
-            $cantidad = isset($item->quantity) ? $item->quantity : null;
-            $nombre   = isset($item->parent_name) ? $item->parent_name : null;
-            foreach ($item->meta_data as $key => $meta_data) {
-                if($meta_data->display_key == 'Talla'){
-                    $talla = $meta_data->display_value;
-                }else{
-                    $color = $meta_data->display_value;
-                }
-            }
-    
-            if(isset($cantidad) && isset($nombre) && isset($talla) && isset($color)){
-                $array_by_item_orde = [
-                    "Referencia" => $nombre,
-                    "Talla" => $talla,
-                    "Color" => $color,
-                    "Cantidad" => $cantidad,
-                ];
-            }else{
-                $cantidad = isset($item->quantity) ? $item->quantity : null;
-                $nombre   = isset($item->name) ? $item->name : null;
-                $talla    =  null;
-                $color    = null;
-    
-                $array_by_item_orde = [
-                    "Referencia" => $nombre,
-                    "Talla" => $talla,
-                    "Color" => $color,
-                    "Cantidad" => $cantidad,
-                ];
-            }
-    
-            json_encode($array_by_item_orde);
-            array_push($array_items_order, $array_by_item_orde);
-        }
-        // var_dump(json_encode($array_items_order));die;
-    
-        $curl = curl_init();
-    
-            curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://www.almacenescaprino.com/api/caprino.php',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => array('action' => 'gettoken','Usuario' => 'webcaprino','Clave' => 'C4pr1n0web##'),
-            ));
-    
-            $response = curl_exec($curl);
-    
-        curl_close($curl);
-        $json_response = json_decode($response);
-        $response_token = $json_response->response;
-        $auth_token = $response_token[0]->Token;
+    /* Prueba de envio de información de una orden */
+        // $orders = $woocommerce->get('orders');
+        // $array_items_order = [];
+        // foreach ($orders as $key => $order) {
+        //     $date = date('Y-m-d');
 
-        $data = [
-            'action' => 'setpedido',
-            'Token' => $auth_token,
-            'NumeroPedido' => $NumeroPedido,
-            'CedulaCliente' => $CedulaCliente,
-            'NombreCliente' => $NombreCliente,
-            'Valor' => $Valor,
-            'FechaPedido' => $FechaPedido,
-            'Referencias' => $array_items_order,
-        ];
+        //     $NumeroPedido = $order->number;
+        //     $CedulaCliente = isset($order->billing->company) ? $order->billing->company : 0;
+        //     $NombreCliente = $order->billing->first_name.' '.$order->billing->last_name;
+        //     $Valor = $order->total;
+        //     $FechaPedido = $date;
+        //     $items = $order->line_items;
+        //     foreach ($items as $key_item => $item) {
+        //         $array_by_item_orde = [];
+        //         $cantidad = isset($item->quantity) ? $item->quantity : null;
+        //         $nombre   = isset($item->parent_name) ? $item->parent_name : null;
+        //         foreach ($item->meta_data as $key => $meta_data) {
+        //             if($meta_data->display_key == 'Talla'){
+        //                 $talla = $meta_data->display_value;
+        //             }else{
+        //                 $color = $meta_data->display_value;
+        //             }
+        //         }
 
-        var_dump(json_encode($data));die;
-    
-        $curl = curl_init();
-    
-            curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://www.almacenescaprino.com/api/caprino.php',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => array(
-                'action' => 'setpedido',
-                'Token' => $auth_token,
-                'NumeroPedido' => $NumeroPedido,
-                'CedulaCliente' => $CedulaCliente,
-                'NombreCliente' => $NombreCliente,
-                'Valor' => $Valor,
-                'FechaPedido' => $FechaPedido,
-                'Referencias' => $array_items_order,
-                // 'Bonos' => '[
-                // 	{
-                // 		"IDBonoFidelizacion":"20766",
-                // 		"Valor":"120000"
-                // 	},
-                // 	{
-                // 		"IDBonoFidelizacion":"20767",
-                // 		"Valor":"110000"
-                // 	}
-                // ]'
-            ),
-            ));
-    
-            $response_order = curl_exec($curl);
-    
-        curl_close($curl);
-        $json_response_products = json_decode($response_order);
-        var_dump($json_response_products);die;
-    }
+        //         if(isset($cantidad) && isset($nombre) && isset($talla) && isset($color)){
+        //             $array_by_item_orde = [
+        //                 "Referencia" => $nombre,
+        //                 "Talla" => $talla,
+        //                 "Color" => $color,
+        //                 "Cantidad" => $cantidad,
+        //             ];
+        //         }else{
+        //             $cantidad = isset($item->quantity) ? $item->quantity : null;
+        //             $nombre   = isset($item->name) ? $item->name : null;
+        //             $talla    =  null;
+        //             $color    = null;
+
+        //             $array_by_item_orde = [
+        //                 "Referencia" => 'ZWP1LIAZ',
+        //                 "Talla" => $talla,
+        //                 "Color" => $color,
+        //                 "Cantidad" => $cantidad,
+        //             ];
+        //         }
+
+        //         json_encode($array_by_item_orde);
+        //         array_push($array_items_order, $array_by_item_orde);
+        //     }
+        //     // var_dump(json_encode($array_items_order));die;
+
+        //     $curl = curl_init();
+
+        //         curl_setopt_array($curl, array(
+        //         CURLOPT_URL => 'https://www.almacenescaprino.com/api/caprino.php',
+        //         CURLOPT_RETURNTRANSFER => true,
+        //         CURLOPT_ENCODING => '',
+        //         CURLOPT_MAXREDIRS => 10,
+        //         CURLOPT_TIMEOUT => 0,
+        //         CURLOPT_FOLLOWLOCATION => true,
+        //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //         CURLOPT_CUSTOMREQUEST => 'POST',
+        //         CURLOPT_POSTFIELDS => array('action' => 'gettoken','Usuario' => 'webcaprino','Clave' => 'C4pr1n0web##'),
+        //         ));
+
+        //         $response = curl_exec($curl);
+
+        //     curl_close($curl);
+        //     $json_response = json_decode($response);
+        //     $response_token = $json_response->response;
+        //     $auth_token = $response_token[0]->Token;
+
+        //     $data = [
+        //         'action' => 'setpedido',
+        //         'Token' => $auth_token,
+        //         'NumeroPedido' => $NumeroPedido,
+        //         'CedulaCliente' => $CedulaCliente,
+        //         'NombreCliente' => $NombreCliente,
+        //         'Valor' => $Valor,
+        //         'FechaPedido' => $FechaPedido,
+        //         'Referencias' => $array_items_order,
+        //     ];
+
+        //     var_dump(json_encode($data));die;
+
+        //     $curl = curl_init();
+
+        //         curl_setopt_array($curl, array(
+        //         CURLOPT_URL => 'https://www.almacenescaprino.com/api/caprino.php',
+        //         CURLOPT_RETURNTRANSFER => true,
+        //         CURLOPT_ENCODING => '',
+        //         CURLOPT_MAXREDIRS => 10,
+        //         CURLOPT_TIMEOUT => 0,
+        //         CURLOPT_FOLLOWLOCATION => true,
+        //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //         CURLOPT_CUSTOMREQUEST => 'POST',
+        //         CURLOPT_POSTFIELDS => array(
+        //             'action' => 'setpedido',
+        //             'Token' => $auth_token,
+        //             'NumeroPedido' => $NumeroPedido,
+        //             'CedulaCliente' => $CedulaCliente,
+        //             'NombreCliente' => $NombreCliente,
+        //             'Valor' => $Valor,
+        //             'FechaPedido' => $FechaPedido,
+        //             'Referencias' => $array_items_order,
+        //             // 'Bonos' => '[
+        //             // 	{
+        //             // 		"IDBonoFidelizacion":"20766",
+        //             // 		"Valor":"120000"
+        //             // 	},
+        //             // 	{
+        //             // 		"IDBonoFidelizacion":"20767",
+        //             // 		"Valor":"110000"
+        //             // 	}
+        //             // ]'
+        //         ),
+        //         ));
+
+        //         $response_order = curl_exec($curl);
+
+        //     curl_close($curl);
+        //     $json_response_products = json_decode($response_order);
+        //     var_dump($json_response_products);die;
+        // }
+    /* FIN Prueba de envio de información de una orden */
 
     $curl = curl_init();
 
@@ -182,9 +184,9 @@ use Automattic\WooCommerce\Client;
     $json_response_products = json_decode($response_products);
     $response_all_products = $json_response_products->response;
 
-    $couny = 0;
+    $count = 0;
     foreach ($response_all_products as $key => $products_api) {
-        if($count < 1){
+        // if($count < 1){
 
             $colors_products = $products_api->Color;
 
@@ -193,6 +195,26 @@ use Automattic\WooCommerce\Client;
             $attributes_array = array("");
             $attributes_color_array = array("");
             $genero = 45;
+            $arrayImages = array("");
+
+            if(!is_null($products_api->ImagenPrincipal)){
+                $arrayImage[0] = [
+                    'src' => $products_api->ImagenPrincipal,
+                ];
+                $key_images = 1;
+            }else{
+                $key_images = 0;
+            }
+
+            $imagenesProduct = $products_api->ImagenReferencia;
+            $key_images = 1;
+            foreach ($imagenesProduct[0] as $key => $imagen) {
+                // var_dump($imagen);die;
+                $arrayImage[$key_images] = [
+                    'src' => $imagen,
+                ];
+                $key_images = $key_images + 1;
+            }
 
             foreach($colors_products as $index => $color_product){
 
@@ -202,7 +224,7 @@ use Automattic\WooCommerce\Client;
                     case 'F':
                         $genero = 49;
                         break;
-                    
+
                     default:
                         $genero = 45;
                         break;
@@ -223,7 +245,7 @@ use Automattic\WooCommerce\Client;
                 'type' => 'variable',
                 'description' => $products_api->TipoReferencia,
                 'short_description' => '',
-                'regular_price' => $price, 
+                'regular_price' => $price,
                 'attributes' => [
                     [
                         /* Envio de tallas */
@@ -232,7 +254,7 @@ use Automattic\WooCommerce\Client;
                         "visible" => true,
                         "variation" => true,
                         "options" => $attributes_array
-                        
+
                     ],
                     [
                         /* Envio de colores */
@@ -241,17 +263,19 @@ use Automattic\WooCommerce\Client;
                         "visible" => true,
                         "variation" => true,
                         "options" => $attributes_color_array
-                        
+
                     ],
-                ],  
+                ],
                 'categories' => [
                     [
                         'id' => $genero
                     ]
-                ],
+                ],'images' => [ $arrayImage ]
             ];
 
-            // var_dump($data);die;
+            return $data;
+
+            var_dump($data);die;
 
             // print_r();die;
 
@@ -296,7 +320,7 @@ use Automattic\WooCommerce\Client;
                     //             "visible" => true,
                     //             "variation" => true,
                     //             "options" => $attributes_array
-                                
+
                     //         ],
                     //         [
                     //             "id" => 1,
@@ -304,9 +328,9 @@ use Automattic\WooCommerce\Client;
                     //             "visible" => true,
                     //             "variation" => true,
                     //             "options" => $attributes_color_array
-                                
+
                     //         ],
-                    //     ],    
+                    //     ],
                     //     'categories' => [
                     //         [
                     //             'id' => $genero
@@ -328,8 +352,8 @@ use Automattic\WooCommerce\Client;
                 // $woocommerce->post('products/'.$id_producto.'/variations', $data_variation_color);
 
             }
-            $count = $count + 1;
-        }
+            // $count = $count + 1;
+        // }
     }
 
 ?>

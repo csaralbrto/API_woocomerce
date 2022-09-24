@@ -140,7 +140,6 @@ function rudr_complete_for_status( $order_id ){
 		json_encode($array_by_item_orde);
 		array_push($array_items_order, $array_by_item_orde);
 	}
-	// var_dump(json_encode($array_items_order));die;
 
     $curl = curl_init();
 
@@ -199,9 +198,6 @@ function rudr_complete_for_status( $order_id ){
 		$response = curl_exec($curl);
 
 	curl_close($curl);
-
-
-
 	
 }
 

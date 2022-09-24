@@ -1,0 +1,26 @@
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+use Automattic\WooCommerce\Client;
+
+    $woocommerce = new Client(
+        'https://deploy.calzadocaprino.com/', // Your store URL
+        'ck_d1c2d0b0a56bd0355329832102097ab6d118a2bf', // Your consumer key
+        'cs_fc512f8f3347845ddf0a0d226a8ae572e297aaf7', // Your consumer secret
+        [
+            'wp_api' => true, // Enable the WP REST API integration
+            'version' => 'wc/v3', // WooCommerce WP REST API version
+            'query_string_auth' => true // Force Basic Authentication as query string true and using under HTTPS
+        ]
+    );
+
+
+$producs_wocommerce = $woocommerce->get('products');
+
+foreach ($producs_wocommerce as $key => $product) {
+    $reference = $product->name;
+    $id_product = $producto->id;
+    
+}
+
+?>
